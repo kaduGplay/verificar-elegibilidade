@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verificação de Segurança</title>
+
+<!-- Meta (Facebook) Pixel -->
+<script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '2333292714140400');
+  fbq('track', 'PageView');
+</script>
+
+<!-- Fim do Meta Pixel -->
+<style>
+  :root {
+    --bg1: #ffffff;
+    --bg2: #f8f9fa;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #202124;
+    --muted: #5f6368;
+    --brand: #1a73e8;
+    --brand-dark: #1d4ed8;
+    --ok: #16a34a;
+    --track: #f1f5f9;
+    --shadow: 0 2px 8px rgba(60, 64, 67, .08);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    min-height: 100vh;
+  }
+
+  .shell {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 28px 24px 24px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .brand .logo {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex: 0 0 auto;
+  }
+
+  .brand .name { font-weight: 700; font-size: 15px; letter-spacing: .2px; }
+  .brand .name span { color: var(--muted); font-weight: 500; }
+
+  h1 {
+    font-size: 20px;
+    margin: 4px 0 6px;
+  }
+
+  .subtitle {
+    margin: 0 0 20px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Checkbox widget */
+  .robot {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 16px;
+    background: #fafafa;
+    min-height: 78px;
+    box-shadow: 0 1px 3px #00000014;
+    cursor: pointer;
+    user-select: none;
+    transition: border-color .2s, background .2s;
+  }
+  .robot:hover { border-color: #cbd5e1; }
+
+  .box {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #cbd5e1;
+    border-radius: 2px;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    transition: all .2s;
+  }
+  .box.checked { border-color: var(--ok); background: var(--ok); }
+  .box .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid #cbd5e1;
+    border-top-color: var(--brand);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    display: none;
+  }
+  .box.loading .spinner { display: block; }
+  .box .check { display: none; }
+  .box.checked .check { display: block; }
+
+  .robot .label { font-size: 15px; font-weight: 500; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Slider challenge */
+  .challenge {
+    margin-top: 0;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height .35s ease, opacity .3s ease, margin-top .3s;
+  }
+  .challenge.open { margin-top: 20px; max-height: 200px; opacity: 1; }
+
+  .challenge p {
+    margin: 0 0 10px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .slider {
+    position: relative;
+    height: 52px;
+    border-radius: 4px;
+    background: var(--track);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    touch-action: none;
+  }
+  .slider .fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 0;
+    background: linear-gradient(90deg, #bbf7d0, #86efac);
+  }
+  .slider .hint {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--muted);
+    pointer-events: none;
+  }
+  .slider .handle {
+    position: absolute;
+    left: 0; top: 0;
+    width: 50px;
+    height: 100%;
+    background: var(--brand);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    cursor: grab;
+    touch-action: none;
+    box-shadow: 0 4px 12px rgba(37,99,235,.4);
+  }
+  .slider .handle:active { cursor: grabbing; }
+  .slider.done .handle { background: var(--ok); box-shadow: none; }
+  .slider.done .hint { color: var(--ok); font-weight: 600; }
+
+  /* Continue button */
+  .continue {
+    margin-top: 20px;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 4px;
+    background: #cbd5e1;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: not-allowed;
+    transition: background .2s, transform .05s;
+  }
+  .continue.ready {
+    background: var(--brand);
+    cursor: pointer;
+  }
+  .continue.ready:hover { background: var(--brand-dark); }
+  .continue.ready:active { transform: translateY(1px); }
+
+  .footer {
+    margin-top: 14px;
+    text-align: center;
+    font-size: 11px;
+    color: #94a3b8;
+  }
+  .widget-brand { margin-left: auto; color: #70757a; text-align: center; font-size: 9px; line-height: 1.5; }
+  .widget-brand svg { display: block; margin: 0 auto 3px; color: var(--brand); }
+  :focus-visible { outline: 3px solid #1a73e8; outline-offset: 4px; }
+  .status { min-height: 20px; margin: 16px 0 0; font-size: 13px; line-height: 1.5; color: var(--muted); text-align: center; }
+  .continue:disabled { cursor: default; }
+  @media (max-width: 360px) { .card { padding: 24px 16px; } .robot { padding: 12px; gap: 10px; } .robot .label { font-size: 14px; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation-duration: 1.5s !important; } }
+</style>
+</head>
+<body>
+  <main class="shell">
+    <div class="card">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="name">Verifica<span>Seguro</span></div>
+      </div>
+
+      <h1>Confirme que você é humano</h1>
+      <p class="subtitle">Conclua a verificação abaixo para continuar.</p>
+
+      <div class="robot" id="robot" role="checkbox" aria-checked="false" tabindex="0" aria-label="Não sou um robô" aria-controls="challenge">
+        <div class="box" id="box">
+          <div class="spinner"></div>
+          <svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="label">Não sou um robô</div>
+        <div class="widget-brand" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m8 12 3 3 5-6"/></svg>VerificaSeguro</div>
+      </div>
+
+      <div class="challenge" id="challenge" inert>
+        <p>Arraste o controle até o final para confirmar.</p>
+        <div class="slider" id="slider">
+          <div class="fill" id="fill"></div>
+          <div class="hint" id="hint">Arraste para a direita &rarr;</div>
+          <div class="handle" id="handle" role="slider" tabindex="0" aria-label="Arraste até o final ou use as setas para confirmar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <button class="continue" id="continue" disabled>Continuar</button>
+
+      <p class="status" id="status" role="status" aria-live="polite">Aguardando sua confirmação.</p>
+      <div class="footer"></div>
+      <noscript>Ative o JavaScript no navegador para continuar.</noscript>
+    </div>
+  </main>
+
+<script>
+  // Para onde a pessoa vai depois de resolver:
+  const DESTINO = "https://cac-brasil-nu.vercel.app/";
+
+  const robot = document.getElementById("robot");
+  const box = document.getElementById("box");
+  const challenge = document.getElementById("challenge");
+  const slider = document.getElementById("slider");
+  const handle = document.getElementById("handle");
+  const fill = document.getElementById("fill");
+  const hint = document.getElementById("hint");
+  const btn = document.getElementById("continue");
+
+  let stage = "idle"; // idle -> loading -> challenge -> verified
+  let redirecting = false;
+  const status = document.getElementById("status");
+  let dragging = false;
+  let solved = false;
+
+  function startChallenge() {
+    if (stage !== "idle") return;
+    stage = "loading";
+    status.textContent = "Preparando a verificação…";
+    box.classList.add("loading");
+    setTimeout(() => {
+      box.classList.remove("loading");
+      stage = "challenge";
+      challenge.classList.add("open");
+      challenge.inert = false;
+      status.textContent = "Arraste o controle ou use as setas do teclado.";
+      handle.focus({ preventScroll: true });
+    }, 900);
+  }
+
+  robot.addEventListener("click", startChallenge);
+  robot.addEventListener("keydown", (e) => {
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); startChallenge(); }
+  });
+
+  // Slider drag (mouse + touch via pointer events)
+  function maxX() { return Math.max(0, slider.clientWidth - handle.clientWidth); }
+
+  function moveTo(x) {
+    x = Math.max(0, Math.min(maxX(), x));
+    handle.style.left = x + "px";
+    fill.style.width = (x + handle.clientWidth) + "px";
+    handle.setAttribute("aria-valuenow", String(Math.round(x / (maxX() || 1) * 100)));
+    if (maxX() > 0 && x >= maxX() - 2 && !solved) complete();
+  }
+
+  function onDown(e) {
+    if (stage !== "challenge" || solved) return;
+    dragging = true;
+    handle.setPointerCapture && handle.setPointerCapture(e.pointerId);
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    const rect = slider.getBoundingClientRect();
+    moveTo(e.clientX - rect.left - handle.clientWidth / 2);
+  }
+
+  function onUp() {
+    if (!dragging) return;
+    dragging = false;
+    if (!solved) { // reset if not completed
+      handle.style.left = "0px";
+      fill.style.width = "0px";
+      handle.setAttribute("aria-valuenow", "0");
+    }
+  }
+
+  handle.addEventListener("pointerdown", onDown);
+  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerup", onUp);
+  handle.addEventListener("pointercancel", onUp);
+  handle.addEventListener("lostpointercapture", onUp);
+  handle.addEventListener("keydown", (e) => {
+    if (stage !== "challenge" || solved) return;
+    if (!["ArrowRight", "ArrowLeft", "Home", "End"].includes(e.key)) return;
+    e.preventDefault();
+    const current = parseFloat(handle.style.left) || 0;
+    moveTo(e.key === "End" ? maxX() : e.key === "Home" ? 0 : current + (e.key === "ArrowRight" ? 1 : -1) * maxX() / 10);
+  });
+  window.addEventListener("resize", () => {
+    if (solved) handle.style.left = maxX() + "px";
+    else { dragging = false; moveTo(0); }
+  });
+
+  function complete() {
+    if (solved) return;
+    solved = true;
+    dragging = false;
+    handle.setAttribute("aria-valuenow", "100");
+    handle.setAttribute("aria-disabled", "true");
+    stage = "verified";
+    handle.style.left = maxX() + "px";
+    fill.style.width = "100%";
+    slider.classList.add("done");
+    hint.innerHTML = "&#10003; Verificado";
+    box.classList.add("checked");
+    robot.setAttribute("aria-checked", "true");
+    btn.disabled = false;
+    btn.classList.add("ready");
+    btn.textContent = "Continuar para o site";
+    redirectAfterSuccess();
+  }
+
+  function redirectAfterSuccess() {
+    if (!solved || redirecting) return;
+    redirecting = true;
+    btn.disabled = true;
+    btn.textContent = "Redirecionando…";
+    status.textContent = "Verificação concluída! Abrindo o site…";
+    // O Pixel não oferece confirmação de entrega. A espera dá tempo ao envio,
+    // mas bloqueadores e falhas de rede podem impedir o registro na Meta.
+    try {
+      if (typeof window.fbq === "function") window.fbq('track', 'AddToCart');
+    } catch (error) {
+      console.warn("O Pixel não pôde registrar o evento.", error);
+    } finally {
+      window.setTimeout(() => { window.location.assign(DESTINO); }, 1500);
+    }
+  }
+
+  btn.addEventListener("click", redirectAfterSuccess);
+</script>
+</body>
+</html>
